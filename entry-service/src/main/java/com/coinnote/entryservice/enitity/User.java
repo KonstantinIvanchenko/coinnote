@@ -21,5 +21,4 @@ public class User {
     private String id;
     //@NotNull
     private String userName;
-
 }

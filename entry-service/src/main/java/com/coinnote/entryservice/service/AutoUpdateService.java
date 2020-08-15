@@ -58,7 +58,8 @@ public class AutoUpdateService extends DataUpdateService<AutoInstance, AutoDto> 
         //save new instance back into repository
         super.commonInstanceRepository.save(autoInstance);
         //Transfer state data to history service
-        <AutoInstance>super.historyClient.sendHistory(autoInstance.getUser().getUserName(), autoInstance);
+        //<AutoInstance>super.historyClient.sendHistory(autoInstance.getUser().getUserName(), autoInstance);
+        super.historyClient.<AutoInstance>sendHistory(autoInstance.getUser().getUserName(), autoInstance);
     }
 
     private AutoInstance mapDtoToInstance(AutoDto dto){
