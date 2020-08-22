@@ -1,4 +1,4 @@
-package com.coinnote.entryservice.components.security;
+package com.coinnote.historyservice;
 
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
@@ -15,12 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -60,13 +58,12 @@ public class KeycloakSecurityConfiguration extends KeycloakWebSecurityConfigurer
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         super.configure(httpSecurity);
         httpSecurity.authorizeRequests()
-                .antMatchers("/api/auth/**")
-                .permitAll()
+                .antMatchers("/api/histupd/**")
+                .hasRole("WRITE_HIST")
                 .anyRequest()
-                .authenticated();
+                .denyAll();
 
         httpSecurity.csrf().disable();
-        httpSecurity.headers().frameOptions().disable();
     }
 
     //Register Keycloak as the Authentication Provider
@@ -83,8 +80,7 @@ public class KeycloakSecurityConfiguration extends KeycloakWebSecurityConfigurer
 
     /**
      * Add the KeycloakClientRequestFactory bean for defining keycloak rest template calls .
-     * This will automatically add the token in the headers of rest template calls.
-     * RestTemplate as scope_prototype is for new instance on every request for injection.
+     * This will automatically add the token in the headers of rest template calls
      * @return
      */
     @Bean
@@ -92,5 +88,6 @@ public class KeycloakSecurityConfiguration extends KeycloakWebSecurityConfigurer
     public KeycloakRestTemplate keycloakRestTemplate() {
         return new KeycloakRestTemplate(keycloakClientRequestFactory);
     }
+
 
 }

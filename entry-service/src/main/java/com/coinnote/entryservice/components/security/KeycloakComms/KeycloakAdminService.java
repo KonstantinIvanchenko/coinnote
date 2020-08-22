@@ -1,23 +1,20 @@
 package com.coinnote.entryservice.components.security.KeycloakComms;
 
+
+import com.coinnote.entryservice.components.security.rolemgmt.KeycloakServicesRole;
 import lombok.AllArgsConstructor;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.security.Principal;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 @AllArgsConstructor
@@ -28,71 +25,51 @@ public class KeycloakAdminService {
     private final KeycloakAccessSettings keycloakAccessSettings;
     @Autowired
     private final Keycloak keycloakAdmin;
+    @Autowired
+    private final KeycloakServicesRole keycloakServicesRole;
 
-    //TODO: here we need to add current user property provider - roles, name, etc..
-
+    /**
+     * Create user within keycloak realm and assign roles.
+     * @param userRepresentation
+     */
     public void saveUserKeycloak(UserRepresentation userRepresentation){
         RealmResource realmResource = keycloakAdmin.realm(keycloakAccessSettings.getKeycloakAdminClientConfig().KeycloakRealm);
-        realmResource.users().create(userRepresentation);
+        //realmResource.users().create(userRepresentation);
+        UsersResource usersResource = realmResource.users();
+        Response response = usersResource.create(userRepresentation);
+        String userId = CreatedResponseUtil.getCreatedId(response);
+
+        //enable access to other microservices while current user logged in
+        keycloakServicesRole.setServicesRoles(realmResource, usersResource, userId);
     }
 
-    //Useless
-    /*
-    public List<UserRepresentation> getUsersByUsernameTemp(String userName){
-
-        KeycloakPrincipal<RefreshableKeycloakSecurityContext> principalKeycloak = null;
-        KeycloakPrincipal principalKeycloakRaw = null;
-        Keycloak keycloak = null;
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            Object principal = authentication.getPrincipal();
-            if (principal instanceof KeycloakPrincipal) {
-                principalKeycloak = KeycloakPrincipal.class.cast(principal);
-            }
-            else {
-                principalKeycloakRaw = (KeycloakPrincipal) principal;
-            }
-        }
-
-        if (principalKeycloakRaw != null)
-            keycloak = keycloakAccessSettings.getKeycloakClient(principalKeycloakRaw.getKeycloakSecurityContext());
-
-        return keycloak.realm(keycloakAccessSettings.getKeycloakAdminClientConfig().getKeycloakResource())
-                .users()
-                .search(userName);
-    }
+    /**
+     * Get users with the name from the keycloak realm.
+     * @param userName
+     * @return
      */
-
-
-    public List<UserRepresentation> getUsersByUsernameAsAdminCli(String userName){
-
-        //This works but not completely right to use admin console credentials to master realm
-
-        Keycloak keycloak = KeycloakBuilder.builder()
-                .serverUrl(keycloakAccessSettings.getKeycloakAdminClientConfig().KeycloakAuthServerUrl)
-                .grantType(OAuth2Constants.PASSWORD)
-                .realm("master")
-                .clientId("admin-cli")
-                .username("admin")
-                .password("ADMIN PASSWORD HERE")
-                .resteasyClient(
-                        new ResteasyClientBuilder()
-                                .connectionPoolSize(10).build()
-                ).build();
-
-        RealmResource realmResource = keycloak.realm(keycloakAccessSettings.getKeycloakAdminClientConfig().KeycloakRealm);
-        List<UserRepresentation> users = realmResource.users().search(userName);
-
-        return users;
-    }
-
-
     public List<UserRepresentation> getUsersByUsername(String userName){
 
         RealmResource realmResource = keycloakAdmin.realm(keycloakAccessSettings.getKeycloakAdminClientConfig().KeycloakRealm);
         List<UserRepresentation> users = realmResource.users().search(userName);
 
         return users;
+    }
+
+    /**
+     * After successful user registry in Keycloak login, it will redirect user session to a Custom page
+     * After that SecurityContext shall contain current user session. Which would allow to get bearer token.
+     * @return
+     */
+    public String getUserToken(){
+        KeycloakAuthenticationToken authentication = (KeycloakAuthenticationToken) SecurityContextHolder.getContext()
+                .getAuthentication();
+
+        @SuppressWarnings(value = "unchecked")
+        KeycloakPrincipal<KeycloakSecurityContext> keycloakPrincipal = (KeycloakPrincipal<KeycloakSecurityContext>) authentication
+                .getPrincipal();
+
+
+        return keycloakPrincipal.getKeycloakSecurityContext().getTokenString();
     }
 }

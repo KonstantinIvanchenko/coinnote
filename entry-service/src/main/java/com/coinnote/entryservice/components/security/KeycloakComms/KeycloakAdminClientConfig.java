@@ -16,17 +16,10 @@ public class KeycloakAdminClientConfig {
     String KeycloakAuthServerUrl;
     @Value("${keycloak.realm}")
     String KeycloakRealm;
-    /*
-    @Value("${keycloak.admin-id}")
+    @Value("${custom.keycloak.admin-id}")
     String KeycloakResource;
-    @Value("${keycloak.admin-secret}")
+    @Value("${custom.keycloak.admin-secret}")
     String KeycloakCredentialsSecret;
-
-     */
-    private final static String KeycloakResource = "keycloak-admin";
-    private final static String KeycloakCredentialsSecret = "af95c8c9-5c06-4072-9688-e95cdef33f34";
-    //keycloak.admin-id=keycloak-admin
-    //keycloak.admin-secret=af95c8c9-5c06-4072-9688-e95cdef33f34
 
     public String getKeycloakAuthServerUrl() {
         return KeycloakAuthServerUrl;
@@ -35,7 +28,6 @@ public class KeycloakAdminClientConfig {
     public String getKeycloakRealm() {
         return KeycloakRealm;
     }
-
 
     public String getKeycloakResource() {
         return KeycloakResource;

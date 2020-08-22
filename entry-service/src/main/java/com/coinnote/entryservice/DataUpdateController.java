@@ -6,7 +6,9 @@ import com.coinnote.entryservice.enitity.auto.AutoInstance;
 import com.coinnote.entryservice.enitity.house.HouseInstance;
 import com.coinnote.entryservice.service.AutoUpdateService;
 import com.coinnote.entryservice.service.DataUpdateService;
+import com.coinnote.entryservice.service.auth.AuthService;
 import lombok.AllArgsConstructor;
+import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,6 @@ public class DataUpdateController {
     //private final DataUpdateService<HouseInstance, HouseDto> dataUpdateServiceHouse;
     //private final AutoUpdateService dataUpdateServiceAuto;
 
-
     @PostMapping(autoCreate)
     public ResponseEntity<AutoDto> createAutoInstance(@RequestBody AutoDto autoDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(dataUpdateServiceAuto.saveAsInstance(autoDto));
@@ -52,4 +53,14 @@ public class DataUpdateController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dataUpdateServiceAuto.getAsDto(id));
     }
 
+    @Autowired
+    KeycloakRestTemplate keycloakRestTemplate;
+
+    @PostMapping("/passhist")
+    public ResponseEntity<Void> TESTpassToHistoryService(){
+        String temp = keycloakRestTemplate.getForEntity("http://localhost:8001/api/histupd/1", String.class).getBody();
+        System.out.println("!!!! TEMP DEBUG:: "+ temp);
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 }

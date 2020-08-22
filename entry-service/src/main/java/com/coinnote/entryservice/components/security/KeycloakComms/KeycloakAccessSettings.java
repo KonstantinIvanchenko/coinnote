@@ -25,7 +25,6 @@ import javax.annotation.PostConstruct;
 @AllArgsConstructor
 public class KeycloakAccessSettings {
 
-
     @Autowired
     private KeycloakAdminClientConfig keycloakAdminClientConfig;
 

@@ -19,7 +19,7 @@ public class KeycloakAdminClient {
     private final KeycloakAdminClientConfig keycloakAdminClientConfig;
 
     @Bean
-    public Keycloak newKeycloakClient() {
+    public Keycloak keycloakAdminClientCreate() {
         Keycloak keycloak = KeycloakBuilder.builder()
                 .serverUrl("http://localhost:8080/auth/")
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
