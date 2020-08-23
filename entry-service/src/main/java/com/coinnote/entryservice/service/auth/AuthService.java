@@ -39,7 +39,6 @@ public class AuthService {
     //private final AuthenticationManager authenticationManager;
 
     public Boolean isUserPresent(UserDto userDto){
-        //TODO: verify this
         if (!keycloakAdminService.getUsersByUsername(userDto.getUserName()).isEmpty())
             return true;
 
@@ -47,17 +46,6 @@ public class AuthService {
     }
 
     public void signup(UserDto userDto){
-
-        //TEST
-
-        UserRepresentation testUser = keycloakAdminService.getUsersByUsername("mock-user").get(0);
-
-        Map<String, List<String>> roles = testUser.getClientRoles();
-        List<String> rroles = testUser.getRealmRoles();
-
-        //~TEST
-
-
         UserRepresentation userRepresentation = new UserRepresentation();
         //Generate id as hash of username and email
         userRepresentation.setId(String.valueOf(userDto.hashCode()));

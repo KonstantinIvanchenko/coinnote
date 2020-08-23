@@ -2,6 +2,7 @@ package com.coinnote.entryservice.components.security.KeycloakComms;
 
 
 import com.coinnote.entryservice.components.security.rolemgmt.KeycloakServicesRole;
+import com.coinnote.entryservice.exception.CoinnoteException;
 import lombok.AllArgsConstructor;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
@@ -9,8 +10,11 @@ import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.IDToken;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -71,5 +75,43 @@ public class KeycloakAdminService {
 
 
         return keycloakPrincipal.getKeycloakSecurityContext().getTokenString();
+    }
+
+    /**
+     * Get userid for principal security context holder.
+     * @return
+     */
+    public String getPrincipalUserId(){
+        return this.getUsersByUsername(this.getPrincipal()
+                .getKeycloakSecurityContext()
+                .getIdToken()
+                .getPreferredUsername())
+                .get(0).getId();
+    }
+
+    /**
+     * Get userName for principal security context holder.
+     * @return
+     */
+    public String getPrincipalUserName(){
+        return this.getPrincipal().getKeycloakSecurityContext().getToken().getPreferredUsername();
+    }
+
+    /**
+     * Extract information about principal security context holder.
+     * @return
+     */
+    private KeycloakPrincipal getPrincipal(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null)
+            throw new CoinnoteException("Principal data check while unauthenticated..");
+        else{
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof KeycloakPrincipal)
+                return KeycloakPrincipal.class.cast(principal);
+            else throw new CoinnoteException("Principal authentication is not provided by Keycloak..");
+        }
     }
 }

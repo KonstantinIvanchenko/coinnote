@@ -1,5 +1,6 @@
 package com.coinnote.entryservice.service;
 
+import com.coinnote.entryservice.components.security.KeycloakComms.KeycloakAdminService;
 import com.coinnote.entryservice.dto.CommonDto;
 import com.coinnote.entryservice.enitity.AccountingTypes;
 import com.coinnote.entryservice.enitity.CommonInstance;
@@ -30,6 +31,8 @@ public abstract class DataUpdateService<I extends CommonInstance, D extends Comm
     protected HistoryClient historyClient;
     @Autowired
     protected DataMapper dataMapper;
+    @Autowired
+    protected KeycloakAdminService keycloakAdminService;
 
     /*
     public I mapDtoToInstance(D dto){

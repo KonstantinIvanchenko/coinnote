@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface CommonInstanceMongoRepository<I extends CommonInstance> extends MongoRepository<I, String> {
     Optional<I> findById(String id);
     //Optional<I> findByName(String name);
-    //Optional<List<I>> findByUserName(String userName);
-    Optional<List<I>> findByUser(User user);
+    Optional<List<I>> findByUserName(String userName);
 }

@@ -59,15 +59,11 @@ public class AutoUpdateService extends DataUpdateService<AutoInstance, AutoDto> 
         super.commonInstanceRepository.save(autoInstance);
         //Transfer state data to history service
         //<AutoInstance>super.historyClient.sendHistory(autoInstance.getUser().getUserName(), autoInstance);
-        super.historyClient.<AutoInstance>sendHistory(autoInstance.getUser().getUserName(), autoInstance);
+        super.historyClient.<AutoInstance>sendHistory(autoInstance.getUserName(), autoInstance);
     }
 
     private AutoInstance mapDtoToInstance(AutoDto dto){
-        //TODO: enable USER
-        User user = new User();
-        user.setId("0");
-        user.setUserName("first_test");
-        return super.dataMapper.map(dto);
+        return super.dataMapper.map(dto, super.keycloakAdminService.getPrincipalUserName());
     }
 
     private AutoDto mapInstanceToDto(AutoInstance autoInstance){
@@ -79,7 +75,6 @@ public class AutoUpdateService extends DataUpdateService<AutoInstance, AutoDto> 
     @Override
     @Transactional
     public AutoDto saveAsInstance(AutoDto dto){
-
         //Ensure all fields are reset on object save
         dto.setAllZero();
 
@@ -88,7 +83,6 @@ public class AutoUpdateService extends DataUpdateService<AutoInstance, AutoDto> 
         autoInstanceUpdate.setId( Integer.toString(dto.hashcode()) );
 
         AutoInstance save = super.commonInstanceRepository.save(autoInstanceUpdate);
-        dto.setId(save.getId());
         dto.setId(save.getId());
 
         return dto;

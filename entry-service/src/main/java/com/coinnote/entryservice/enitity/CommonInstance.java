@@ -25,7 +25,7 @@ public abstract class CommonInstance {
     private String title;
 
     //@NotNull
-    private User user;
+    private String userName;
     private Long totalSpending;
 
     //@NotNull
