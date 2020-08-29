@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,13 +33,12 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 //@EnableWebSecurity
 @EnableGlobalMethodSecurity(jsr250Enabled = true)
 @KeycloakConfiguration
-@Profile("!test")
-public class KeycloakSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
-
+@Profile("test")
+public class TestKeycloakSecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
 
     private final KeycloakClientRequestFactory keycloakClientRequestFactory;
 
-    public KeycloakSecurityConfiguration(KeycloakClientRequestFactory keycloakClientRequestFactory) {
+    public TestKeycloakSecurityConfiguration(KeycloakClientRequestFactory keycloakClientRequestFactory) {
         this.keycloakClientRequestFactory = keycloakClientRequestFactory;
 
         // to use principal and authentication together with @async
@@ -62,13 +62,16 @@ public class KeycloakSecurityConfiguration extends KeycloakWebSecurityConfigurer
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         super.configure(httpSecurity);
         httpSecurity.authorizeRequests()
-                .antMatchers("/api/auth/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
+                .antMatchers("/**")
+                .permitAll();
 
         httpSecurity.csrf().disable();
         httpSecurity.headers().frameOptions().disable();
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/**");
     }
 
     //Register Keycloak as the Authentication Provider

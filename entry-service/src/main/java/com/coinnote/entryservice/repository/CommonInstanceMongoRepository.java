@@ -1,7 +1,6 @@
 package com.coinnote.entryservice.repository;
 
-import com.coinnote.entryservice.enitity.CommonInstance;
-import com.coinnote.entryservice.enitity.User;
+import com.coinnote.entryservice.entity.CommonInstance;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 

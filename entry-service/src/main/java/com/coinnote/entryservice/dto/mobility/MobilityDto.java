@@ -1,4 +1,4 @@
-package com.coinnote.entryservice.dto.auto;
+package com.coinnote.entryservice.dto.mobility;
 
 import com.coinnote.entryservice.dto.CommonDto;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AutoDto extends CommonDto {
+public class MobilityDto extends CommonDto {
     public Double partSpending;
     public Double serviceSpending;
     public Double petrolSpending;
@@ -18,7 +18,7 @@ public class AutoDto extends CommonDto {
         this.petrolSpending=0d;
     }
 
-    public AutoDto setTotalSpending(){
+    public MobilityDto setTotalSpending(){
         super.setAccountDelta(Double.doubleToLongBits(this.partSpending+
                                                             this.serviceSpending+
                                                             this.petrolSpending));

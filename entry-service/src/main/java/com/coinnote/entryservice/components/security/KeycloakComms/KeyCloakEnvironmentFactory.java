@@ -1,5 +1,6 @@
 package com.coinnote.entryservice.components.security.KeycloakComms;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,6 +1,6 @@
 package com.coinnote.entryservice.service.history;
 
-import com.coinnote.entryservice.enitity.CommonInstance;
+import com.coinnote.entryservice.entity.CommonInstance;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;

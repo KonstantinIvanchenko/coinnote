@@ -1,4 +1,4 @@
-package com.coinnote.entryservice.enitity;
+package com.coinnote.entryservice.entity;
 
 //import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;

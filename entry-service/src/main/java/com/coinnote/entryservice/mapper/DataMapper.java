@@ -1,16 +1,11 @@
 package com.coinnote.entryservice.mapper;
 
-import com.coinnote.entryservice.dto.CommonDto;
-import com.coinnote.entryservice.dto.auto.AutoDto;
-import com.coinnote.entryservice.dto.auto.HouseDto;
-import com.coinnote.entryservice.enitity.AccountingTypes;
-import com.coinnote.entryservice.enitity.CommonInstance;
-import com.coinnote.entryservice.enitity.User;
-import com.coinnote.entryservice.enitity.auto.AutoInstance;
-import com.coinnote.entryservice.enitity.house.HouseInstance;
+import com.coinnote.entryservice.dto.housing.HousingDto;
+import com.coinnote.entryservice.dto.mobility.MobilityDto;
+import com.coinnote.entryservice.entity.AccountingTypes;
+import com.coinnote.entryservice.entity.housing.HousingInstance;
+import com.coinnote.entryservice.entity.mobility.MobilityInstance;
 import org.mapstruct.*;
-
-import java.util.HashMap;
 
 /*
 @Mapper(componentModel = "spring")
@@ -37,29 +32,29 @@ public abstract class DataMapper {
     //@Mapping(target = "accountSpentPetrol", ignore=true)
     //@Mapping(target = "accountSpentParts", ignore=true)
     //@Mapping(target = "totalSpending", ignore=true)
-    public abstract AutoInstance map(AutoDto dto, String userName);
-    public abstract HouseInstance map(HouseDto dto, String userName);
+    public abstract MobilityInstance map(MobilityDto dto, String userName);
+    public abstract HousingInstance map(HousingDto dto, String userName);
 
-    public abstract AutoDto map(AutoInstance autoInstance);
-    public abstract HouseDto map(HouseInstance houseInstance);
+    public abstract MobilityDto map(MobilityInstance mobilityInstance);
+    public abstract HousingDto map(HousingInstance housingInstance);
 
 
     @AfterMapping
-    protected void mapAutoAccountUpdates(AutoDto dto,
-                                       @MappingTarget final AutoInstance autoInstance){
+    protected void mapAutoAccountUpdates(MobilityDto dto,
+                                         @MappingTarget final MobilityInstance mobilityInstance){
 
-        autoInstance.getAccountSpentService().put(AccountingTypes.w.toString(), dto.serviceSpending.longValue());
-        autoInstance.getAccountSpentService().put(AccountingTypes.m.toString(), dto.serviceSpending.longValue());
-        autoInstance.getAccountSpentService().put(AccountingTypes.y.toString(), dto.serviceSpending.longValue());
+        mobilityInstance.getAccountSpentService().put(AccountingTypes.w.toString(), dto.serviceSpending.longValue());
+        mobilityInstance.getAccountSpentService().put(AccountingTypes.m.toString(), dto.serviceSpending.longValue());
+        mobilityInstance.getAccountSpentService().put(AccountingTypes.y.toString(), dto.serviceSpending.longValue());
 
-        autoInstance.getAccountSpentPetrol().put(AccountingTypes.w.toString(), dto.petrolSpending.longValue());
-        autoInstance.getAccountSpentPetrol().put(AccountingTypes.m.toString(), dto.petrolSpending.longValue());
-        autoInstance.getAccountSpentPetrol().put(AccountingTypes.y.toString(), dto.petrolSpending.longValue());
+        mobilityInstance.getAccountSpentPetrol().put(AccountingTypes.w.toString(), dto.petrolSpending.longValue());
+        mobilityInstance.getAccountSpentPetrol().put(AccountingTypes.m.toString(), dto.petrolSpending.longValue());
+        mobilityInstance.getAccountSpentPetrol().put(AccountingTypes.y.toString(), dto.petrolSpending.longValue());
 
-        autoInstance.getAccountSpentParts().put(AccountingTypes.w.toString(), dto.partSpending.longValue());
-        autoInstance.getAccountSpentParts().put(AccountingTypes.m.toString(), dto.partSpending.longValue());
-        autoInstance.getAccountSpentParts().put(AccountingTypes.y.toString(), dto.partSpending.longValue());
+        mobilityInstance.getAccountSpentParts().put(AccountingTypes.w.toString(), dto.partSpending.longValue());
+        mobilityInstance.getAccountSpentParts().put(AccountingTypes.m.toString(), dto.partSpending.longValue());
+        mobilityInstance.getAccountSpentParts().put(AccountingTypes.y.toString(), dto.partSpending.longValue());
 
-        autoInstance.setTotalSpending(0l);
+        mobilityInstance.setTotalSpending(0l);
     }
 }

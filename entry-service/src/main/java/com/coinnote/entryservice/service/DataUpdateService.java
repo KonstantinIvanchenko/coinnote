@@ -2,12 +2,11 @@ package com.coinnote.entryservice.service;
 
 import com.coinnote.entryservice.components.security.KeycloakComms.KeycloakAdminService;
 import com.coinnote.entryservice.dto.CommonDto;
-import com.coinnote.entryservice.enitity.AccountingTypes;
-import com.coinnote.entryservice.enitity.CommonInstance;
+import com.coinnote.entryservice.entity.AccountingTypes;
+import com.coinnote.entryservice.entity.CommonInstance;
 import com.coinnote.entryservice.mapper.DataMapper;
 import com.coinnote.entryservice.repository.CommonInstanceMongoRepository;
 import com.coinnote.entryservice.service.history.HistoryClient;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

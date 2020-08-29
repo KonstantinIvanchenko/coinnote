@@ -1,4 +1,4 @@
-package com.coinnote.entryservice.enitity;
+package com.coinnote.entryservice.entity;
 
 //import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,18 +18,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public abstract class CommonInstance {
     @Id
-    //@NotNull
-    //private Long id;
     private String id;
-    //@NotNull
     private String title;
-
-    //@NotNull
     private String userName;
     private Long totalSpending;
-
-    //@NotNull
     private LocalDateTime createdAt;
-    //@NotNull
     private LocalDateTime editedAt;
 }
