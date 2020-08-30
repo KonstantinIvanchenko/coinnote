@@ -24,6 +24,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @Component
+@Profile("!test")
 public class KeycloakAdminService {
 
     @Autowired

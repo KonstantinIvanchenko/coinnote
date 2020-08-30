@@ -16,9 +16,9 @@ public class CommonDto {
     private String id;
     private String title;
 
-    @JsonIgnore
+    //@JsonIgnore
     private final LocalDateTime editedAt = LocalDateTime.now();
-    @JsonIgnore
+    //@JsonIgnore
     private final LocalDateTime createdAt = LocalDateTime.now();
 
     private Long accountDelta;

@@ -2,8 +2,11 @@ package com.coinnote.entryservice.service;
 
 import com.coinnote.entryservice.components.security.KeycloakComms.KeycloakAdminService;
 import com.coinnote.entryservice.dto.CommonDto;
+import com.coinnote.entryservice.dto.mobility.MobilityDto;
 import com.coinnote.entryservice.entity.AccountingTypes;
 import com.coinnote.entryservice.entity.CommonInstance;
+import com.coinnote.entryservice.entity.mobility.MobilityInstance;
+import com.coinnote.entryservice.exception.CoinnoteException;
 import com.coinnote.entryservice.mapper.DataMapper;
 import com.coinnote.entryservice.repository.CommonInstanceMongoRepository;
 import com.coinnote.entryservice.service.history.HistoryClient;
@@ -12,12 +15,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -50,9 +58,9 @@ public abstract class DataUpdateService<I extends CommonInstance, D extends Comm
     @Transactional
     public abstract void updateAsInstance(D dto);
     @Transactional
-    public abstract D getAsDto(Long id);
+    public abstract D getAsDto(Long id, String period);
     @Transactional
-    public abstract D getAsDto(String id);
+    public abstract D getAsDto(String id, String period);
 
 
     //TODO: implement this
@@ -113,5 +121,73 @@ public abstract class DataUpdateService<I extends CommonInstance, D extends Comm
                                          HashMap<String, Long> updatesHashMap){
         updatesHashMap.forEach((k, v) -> modifyHashMap.merge(k, v, Long::sum));
 
+    }
+
+    @Transactional
+    protected void updateRepositoryInstance(I instanceUpdate) {
+
+        String id = instanceUpdate.getId();
+
+        if (id == null) throw new CoinnoteException("Exc: "+ this.getClass().getName() + ": ID shall not be null.");
+
+        I instance = commonInstanceRepository
+                .findById(id)
+                .orElseThrow(() -> new CoinnoteException(id, this.getClass().toString()));
+
+        //Merge existing instance with updates
+        //Below we sum up fields checking the date expiry
+        for (Field field : MobilityInstance.class.getDeclaredFields()){
+            if(field.getName().startsWith("accountSpent")){
+                field.setAccessible(true);
+                try {
+                    updateNumericAccounts(HashMap.class.cast(field.get(instance)),
+                            HashMap.class.cast(field.get(instanceUpdate)));
+
+                }catch (IllegalAccessException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+        //Total spendings are simple merge together with all current adders
+        instance.setTotalSpending(instance.getTotalSpending()
+                + instanceUpdate.getTotalSpending());
+        //update edited date
+        instance.setEditedAt(instanceUpdate.getEditedAt());
+        //save new instance back into repository
+        commonInstanceRepository.save(instance);
+        //Transfer state data to history service
+        //<AutoInstance>super.historyClient.sendHistory(autoInstance.getUser().getUserName(), autoInstance);
+        //historyClient.<MobilityInstance>sendHistory(mobilityInstance.getUserName(), mobilityInstance);
+    }
+
+
+    @Transactional
+    public D saveRepositoryInstance(D dto, I instanceUpdate){
+        //Generate id based on dto properties
+        instanceUpdate.setId( Integer.toString(dto.hashcode()) );
+        dto.setId(commonInstanceRepository.save(instanceUpdate).getId());
+
+        return dto;
+    }
+
+    protected I getTimedInstance(String id){
+        I instance = commonInstanceRepository
+                .findById(id)
+                .orElseThrow(() -> new CoinnoteException(id, MobilityInstance.class.toString()));
+
+        ArrayList<HashMap<String, Long>> insertion = Arrays.stream(instance.getClass().getMethods())
+                .filter(method -> method.getName().startsWith("getAccount"))
+                .map(method -> {
+                    try { return (HashMap<String, Long>) method.invoke(instance);}
+                    catch (IllegalAccessException | InvocationTargetException e){
+                        throw new CoinnoteException("Exc: " + this.getClass().getName() +
+                                "getAsDto mapping exception.");
+                    }
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        this.checkAndResetIfTimeExpired(instance, insertion);
+
+        return instance;
     }
 }

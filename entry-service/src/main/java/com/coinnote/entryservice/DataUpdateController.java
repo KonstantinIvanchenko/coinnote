@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class DataUpdateController {
 
-    private final static  String id = "/{id}";
+    private final static String id = "/{id}";
+    private final static String period = "/{period}";
 
     private final static String mobility = "/mobility";
     private final static String housing = "/housing";
@@ -27,11 +29,11 @@ public class DataUpdateController {
 
     private final static String mobilityCreate = mobility+create;
     private final static String mobilityUpdate = mobility+update;
-    private final static String mobilityById = mobility+id;
+    private final static String mobilityById = mobility+id+period;
 
     private final static String housingCreate = housing+create;
     private final static String housingUpdate = housing+update;
-    private final static String housingById = housing+id;
+    private final static String housingById = housing+id+period;
 
     private final DataUpdateService<MobilityInstance, MobilityDto> dataUpdateServiceMobility;
     private final DataUpdateService<HousingInstance, HousingDto> dataUpdateServiceHousing;
@@ -39,7 +41,8 @@ public class DataUpdateController {
     //-----------------------------------------------------------------------------------------------------------------
     @PostMapping(mobilityCreate)
     public ResponseEntity<MobilityDto> createMobilityInstance(@RequestBody MobilityDto mobilityDto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(dataUpdateServiceMobility.saveAsInstance(mobilityDto));
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
+                .body(dataUpdateServiceMobility.saveAsInstance(mobilityDto));
     }
 
     @PostMapping(mobilityUpdate)
@@ -49,13 +52,15 @@ public class DataUpdateController {
     }
 
     @GetMapping(mobilityById)
-    public ResponseEntity<MobilityDto> getMobilityInstance(@PathVariable String id){
-        return ResponseEntity.status(HttpStatus.CREATED).body(dataUpdateServiceMobility.getAsDto(id));
+    public ResponseEntity<MobilityDto> getMobilityInstance(@PathVariable String id, @PathVariable String period){
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
+                .body(dataUpdateServiceMobility.getAsDto(id, period));
     }
     //-----------------------------------------------------------------------------------------------------------------
     @PostMapping(housingCreate)
     public ResponseEntity<HousingDto> createHousingInstance(@RequestBody HousingDto housingDto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(dataUpdateServiceHousing.saveAsInstance(housingDto));
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
+        .body(dataUpdateServiceHousing.saveAsInstance(housingDto));
     }
 
     @PostMapping(housingUpdate)
@@ -65,8 +70,9 @@ public class DataUpdateController {
     }
 
     @GetMapping(housingById)
-    public ResponseEntity<HousingDto> getHousingInstance(@PathVariable String id){
-        return ResponseEntity.status(HttpStatus.CREATED).body(dataUpdateServiceHousing.getAsDto(id));
+    public ResponseEntity<HousingDto> getHousingInstance(@PathVariable String id, @PathVariable String period){
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON)
+                .body(dataUpdateServiceHousing.getAsDto(id, period));
     }
     //-----------------------------------------------------------------------------------------------------------------
 
