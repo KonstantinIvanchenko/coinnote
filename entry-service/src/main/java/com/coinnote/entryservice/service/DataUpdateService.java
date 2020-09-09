@@ -34,24 +34,12 @@ public abstract class DataUpdateService<I extends CommonInstance, D extends Comm
 
     @Autowired
     protected CommonInstanceMongoRepository<I> commonInstanceRepository;
-    @Autowired
-    protected HistoryClient historyClient;
+    //@Autowired
+    //protected HistoryClient historyClient;
     @Autowired
     protected DataMapper dataMapper;
     @Autowired
     protected KeycloakAdminService keycloakAdminService;
-
-    /*
-    public I mapDtoToInstance(D dto){
-        //TODO:get user
-        User user = new User();
-        return dataMapper.mapDtoToInstance(dto, user);
-    }
-
-    public D mapInstanceToDto(I instance){
-        return dataMapper.mapInstanceToDto(instance);
-    }
-    */
 
     @Transactional
     public abstract D saveAsInstance(D dto);
@@ -62,8 +50,6 @@ public abstract class DataUpdateService<I extends CommonInstance, D extends Comm
     @Transactional
     public abstract D getAsDto(String id, String period);
 
-
-    //TODO: implement this
     protected void checkAndResetIfTimeExpired(I instance, List<HashMap<String, Long>> modifyHashMaps){
 
         boolean isUpdateRequiredWeek = false;
@@ -124,7 +110,7 @@ public abstract class DataUpdateService<I extends CommonInstance, D extends Comm
     }
 
     @Transactional
-    protected void updateRepositoryInstance(I instanceUpdate) {
+    protected I updateRepositoryInstance(I instanceUpdate) {
 
         String id = instanceUpdate.getId();
 
@@ -154,10 +140,8 @@ public abstract class DataUpdateService<I extends CommonInstance, D extends Comm
         //update edited date
         instance.setEditedAt(instanceUpdate.getEditedAt());
         //save new instance back into repository
-        commonInstanceRepository.save(instance);
-        //Transfer state data to history service
-        //<AutoInstance>super.historyClient.sendHistory(autoInstance.getUser().getUserName(), autoInstance);
-        //historyClient.<MobilityInstance>sendHistory(mobilityInstance.getUserName(), mobilityInstance);
+        //transfer return data to AfterReturning advice declared in: aspectconfig.HistoryServiceAspect
+        return commonInstanceRepository.save(instance);
     }
 
 

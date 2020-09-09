@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(name = "history-service", fallback = HistoryClientFallback.class)
 public interface HistoryClient{
     @RequestMapping(method = RequestMethod.PUT,
-            value = "/history/{userName}",
+            value = "/history/{userName}/{instanceName}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    <I extends CommonInstance>  void sendHistory(@PathVariable("userName") String userName,
-                                                 @RequestBody I commonInstance);
+    void sendHistory(@PathVariable("userName") String userName,
+                     @PathVariable("instanceName") String instanceName,
+                     @RequestBody CommonInstance commonInstance);
 }
