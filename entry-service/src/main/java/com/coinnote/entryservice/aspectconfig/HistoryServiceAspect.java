@@ -11,6 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+
+/*
 @Aspect
 @Configuration
 public class HistoryServiceAspect {
@@ -32,5 +38,32 @@ public class HistoryServiceAspect {
                 instance.getUserName(),
                 instance.getClass().getSimpleName(),
                 instance);
+    }
+}
+
+ */
+
+@Aspect
+@Configuration
+@EnableBinding(Source.class)
+public class HistoryServiceAspect {
+
+    @Autowired
+    private Source source;
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @AfterReturning(value = "execution(com.coinnote.entryservice.entity.CommonInstance+ " +
+            "com.coinnote.entryservice.service.DataUpdateService.updateRepositoryInstance(..))",
+            returning = "instance")
+    public void afterRunning(JoinPoint joinPoint, CommonInstance instance){
+        logger.info("after execution of {}", joinPoint);
+
+        /* STUB
+        Message<CommonInstance> message = MessageBuilder.withPayload((instance))
+                .
+
+         */
+
     }
 }
